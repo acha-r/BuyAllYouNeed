@@ -1,6 +1,6 @@
-# AllYouNeedShop
+# BuyAllYouNeed
 This repository contains a powerful e-commerce RESTful API built using MongoDB as the backend database and ASP.NET Core. 
-AllYouNeedShop provides a feature-rich platform for managing products, user accounts, and payments. With integrated support for text search 
+BuyAllYouNeed provides a feature-rich platform for managing products, user accounts, and payments. With integrated support for text search 
 and a Paystack payment gateway, this API offers a seamless and secure e-commerce experience.
 
 ## Features
@@ -22,11 +22,11 @@ Profile Management: Users can manage their profiles, update personal information
 experience and provides personalized services.
 
 ### Payment Integration
-Paystack Integration: AllYouNeedShop integrates with the Paystack payment gateway, allowing users to make test purchases securely. This 
+Paystack Integration: BuyAllYouNeed integrates with the Paystack payment gateway, allowing users to make test purchases securely. This 
 ensures a smooth payment process for customers and facilitates seamless transactions.
 
 ## Tech Stack
-AllYouNeedShop is built using the following technologies:
+BuyAllYouNeed is built using the following technologies:
 
 C#: A versatile and powerful programming language that provides a robust foundation for building scalable and efficient applications.
 
