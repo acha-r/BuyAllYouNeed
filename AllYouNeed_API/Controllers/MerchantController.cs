@@ -1,4 +1,5 @@
-﻿using AllYouNeed_Models.Models;
+﻿using AllYouNeed_Models.DTOS.Requests;
+using AllYouNeed_Models.Models;
 using AllYouNeed_Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -17,29 +18,33 @@ namespace AllYouNeed_API.Controllers
             this.merchantServices = merchantServices;
         }
 
-        [HttpGet]
+        [HttpGet("get-all-merchants")]
         public async Task<ActionResult<List<Merchant>>> Get()
             => await merchantServices.GetMerchants();
 
-        [HttpGet("{id}")]
-        public async Task<ActionResult<Merchant>> Get(string id)
-            => await merchantServices.GetMerchant(id);
+        [HttpGet("get-merchant")]
+        public async Task<ActionResult<Merchant>> Get(string email)
+            => await merchantServices.GetMerchant(email);
 
-        [HttpPost]
-        public async Task<ActionResult<Merchant>> Post([FromBody] Merchant merchant)
+        [HttpPost("register-merchant")]
+        public async Task<IActionResult> Post(string email, [FromBody] DepositRequest request)
         {
-            await merchantServices.RegisterMerchant(merchant);
-            return CreatedAtAction(nameof(Get), new { id = merchant.Id, merchant });
+            return Ok(await merchantServices.RegisterMerchant(email, request));
         }
 
-        [HttpPut("{id}")]
-        public async Task Put(string id, [FromBody] Merchant merchant)
-            => await merchantServices.UpdateMerchantInfo(id, merchant);
+        [HttpPut("update-merchant")]
+        public async Task<IActionResult> Put(string email, [FromBody] UpdateMerchantRequest merchant)
+            => Ok(await merchantServices.UpdateMerchantInfo(email, merchant));
 
 
-        // DELETE api/<MerchantController>/5
-        [HttpDelete("{id}")]
-        public async Task Delete(string id)
-        => await merchantServices.DeleteMerchant(id);
+        [HttpPut("update-balance")]
+        public async Task UpdateBalance(string email, [FromBody]DepositRequest request)
+        => await merchantServices.UpdateWallet(email, request);
+
+        [HttpPut("change-active-status")]
+        public async Task IsActive(string email)
+        {
+            await merchantServices.ToggleActiveStatus(email);
+        }
     }
 }
