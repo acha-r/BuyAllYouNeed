@@ -9,6 +9,7 @@ namespace AllYouNeed_Models.DTOS.Requests
 {
     public class CartDTO
     {
+        [Required]
         public Dictionary<string, int>? Products { get; set; }
 
         [Required]

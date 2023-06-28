@@ -17,6 +17,7 @@ namespace AllYouNeed_Models.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public ObjectId Id { get; set; }
         public Dictionary<string, int>? Products { get; set; }
+        public decimal TotalAmt { get; set; }
 
         [EmailAddress]
         public string BuyerEmail { get; set; } = string.Empty;
