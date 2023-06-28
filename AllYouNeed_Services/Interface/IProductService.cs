@@ -13,7 +13,7 @@ namespace AllYouNeed_Services.Interface
         Task<List<Product>> GetProductBySearch(string text); //text search and pagination
         Task<Product> RegisterProduct(Product product);
         Task UpdateProductInfo(string id, Product merchant);
-        Task UpdateInStockStatus(string id);
+        Task CheckInStockStatus(string id);
         Task DeleteProduct(string id);
     }
 }
