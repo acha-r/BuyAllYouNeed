@@ -1,26 +1,31 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
 
 namespace AllYouNeed_Models.Models
 {
-   // [BsonIgnoreExtraElements]
+    [BsonIgnoreExtraElements]
     public class Merchant
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)] //converts Mongo datatype to a .net datatype
-        public string Id { get; set; }
+        public ObjectId Id { get; set; }
 
-        [BsonElement("first_name")]
+ /*       [BsonElement("first_name")]
         public string FirstName { get; set; } = string.Empty;
 
         [BsonElement("last_name")]
-        public string LastName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;*/
 
         [BsonElement("email")]
+        [EmailAddress]
         public string Email { get; set; } = string.Empty;
 
+        [BsonElement("full_name")]
+        public string FullName { get; set; } = string.Empty;
+
         [BsonElement("active")]
-        public bool IsActive { get; set; } 
+        public bool IsActive { get; set; } = true;
 
         [BsonElement("balance")]
         public decimal Balance { get; set; }

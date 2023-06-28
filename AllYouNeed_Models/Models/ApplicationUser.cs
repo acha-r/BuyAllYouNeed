@@ -12,5 +12,6 @@ namespace AllYouNeed_Models.Models
     public class ApplicationUser : MongoIdentityUser<Guid>
     {
         public string FullName { get; set; } = string.Empty;
+        public string Gender { get; set; } = string.Empty;
     }
 }
