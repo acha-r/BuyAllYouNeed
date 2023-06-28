@@ -17,6 +17,9 @@ namespace AllYouNeed_Models.DTOS.Requests
         
         [Required]
         public string FullName { get; set; } = string.Empty;
+
+        [Required]
+        public string Gender { get; set; }
         
         [Required, DataType(DataType.Password)]
         public string Password { get; set; } = string.Empty;
