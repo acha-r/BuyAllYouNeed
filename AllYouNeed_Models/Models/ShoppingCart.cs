@@ -16,12 +16,21 @@ namespace AllYouNeed_Models.Models
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public ObjectId Id { get; set; }
+
+        [BsonElement("products")]
         public Dictionary<string, int>? Products { get; set; }
+
+        [BsonElement("total_amt")]
         public decimal TotalAmt { get; set; }
 
+        [BsonElement("email")]
         [EmailAddress]
         public string BuyerEmail { get; set; } = string.Empty;
+
+        [BsonElement("deliver_address")]
         public string DeliveryAddress { get; set; } = string.Empty;
+
+        [BsonElement("has_paid")]
         public bool HasPaid { get; set; } = false;
     }
 }

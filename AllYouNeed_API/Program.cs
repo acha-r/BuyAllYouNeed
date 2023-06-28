@@ -94,9 +94,9 @@ namespace AllYouNeed_API
             new MongoClient(builder.Configuration.GetValue<string>("AllYouNeedRepo:ConnectionString")));
 
             builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-            builder.Services.AddSingleton<IMerchantServices, MerchantService>();
-            builder.Services.AddSingleton<IProductService, ProductService>();
-            builder.Services.AddSingleton<ICartServices, CartServices>();
+            builder.Services.AddScoped<IMerchantServices, MerchantService>();
+            builder.Services.AddScoped<IProductService, ProductService>();
+            builder.Services.AddScoped<ICartServices, CartServices>();
             builder.Services.AddTransient<IPaystackPaymentService, PaystackPaymentService>();
 
 

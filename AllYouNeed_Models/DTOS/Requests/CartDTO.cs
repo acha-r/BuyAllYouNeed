@@ -10,7 +10,7 @@ namespace AllYouNeed_Models.DTOS.Requests
     public class CartDTO
     {
         [Required]
-        public Dictionary<string, int>? Products { get; set; }
+        public Dictionary<string, int>? Products { get; set; } = new Dictionary<string, int>();
 
         [Required]
         public string DeliveryAddress { get; set; } = string.Empty;

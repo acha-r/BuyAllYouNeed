@@ -18,19 +18,17 @@ namespace AllYouNeed_API.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> InitializePayement(string productId, string buyerId, int numOfItems)
+        public async Task<IActionResult> InitializePayement(string cartId)
         {
-            var response = await _paymentService.InitializeTransaction(productId, buyerId, numOfItems);
+            var response = await _paymentService.InitializeTransaction(cartId);
             
-           Redirect (response.Data.AuthorizationUrl);
-            return Ok(response);
+            return Ok(response.Data.AuthorizationUrl);
         }
 
         [HttpGet]
-        public IActionResult Verfiy(string reference)
+        public async Task<IActionResult> Verfiy(string reference, string cartId)
         {
-            var response = _paymentService.Verfiy(reference);
-            return Ok(response);
+            return Ok(await _paymentService.Verfiy(reference, cartId));
         }
     }
 

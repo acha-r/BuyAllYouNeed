@@ -14,15 +14,13 @@ namespace AllYouNeed_Services.Implementation
         private readonly string? _token;
         private PayStackApi _paystackApi;
         private IProductService _productService;
-        private IMerchantServices _merchantService;
         private IMongoDatabase _database;
         private readonly IMongoCollection<Product> _products;
 
 
-        public PaystackPaymentService(IAllYouNeedRepo dbSetting, IMongoClient mongoClient, IConfiguration configuration, IProductService product, IMerchantServices merchant)
+        public PaystackPaymentService(IAllYouNeedRepo dbSetting, IMongoClient mongoClient, IConfiguration configuration, IProductService product)
         {
             _productService = product;
-            _merchantService = merchant;
             _configuration = configuration;
             _token = _configuration["Paystack:SecretKey"];
             _paystackApi = new PayStackApi(_token);
@@ -44,27 +42,34 @@ namespace AllYouNeed_Services.Implementation
                 CallbackUrl = "https://localhost:7061/swagger/index.html"
             };
             
-            TransactionInitializeResponse response = _paystackApi.Transactions.Initialize(request);
+            return _paystackApi.Transactions.Initialize(request);            
+        }
 
-            if (response.Status)
+        public async Task<TransactionVerifyResponse> Verfiy(string reference, string cartId)
+        {
+
+            TransactionVerifyResponse response = _paystackApi.Transactions.Verify(reference);
+            
+            var cart = await _database.GetCollection<ShoppingCart>("Cart").Find(x => x.Id.ToString() == cartId).FirstOrDefaultAsync() ?? throw new Exception("Order not found");
+
+            if (response.Data.Status == "success")
             {
-                
+                ObjectId id = new(cartId);
+                await _database.GetCollection<ShoppingCart>("Cart")
+                    .UpdateOneAsync(Builders<ShoppingCart>.Filter.Eq("_id", id),
+                    Builders<ShoppingCart>.Update.Set("has_paid", true));
+
                 foreach (var item in cart.Products)
                 {
                     var product = _products.Find(x => x.Id.ToString() == item.Key).FirstOrDefault();
                     product.Quantity -= item.Value;
-                    var productQtyFilter = Builders<Product>.Filter.Eq("_id", product.Id);
-                    var updateQty = Builders<Product>.Update.Set("quantity", product.Quantity);
+
+                    await _products.UpdateOneAsync(Builders<Product>.Filter.Eq("_id", product.Id),
+                        Builders<Product>.Update.Set("quantity", product.Quantity));
+
                     await _productService.CheckInStockStatus(item.Key);
                 }
             }
-            return response;
-
-
-        }
-        public TransactionVerifyResponse Verfiy(string reference)
-        {
-            TransactionVerifyResponse response = _paystackApi.Transactions.Verify(reference);
             return response;
         }
 

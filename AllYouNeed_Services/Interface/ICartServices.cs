@@ -10,8 +10,10 @@ namespace AllYouNeed_Services.Interface
 {
     public interface ICartServices
     {
-        Task MakeAnOrder(string email, CartDTO cart);
+        Task<CartResponse> MakeAnOrder(string email, CartDTO cart);
         Task<CartResponse> UpdateOrder(string cartId, CartDTO cartUpdate);
+        Task DeleteOrder(string cartId);
+        Task<CartResponse> GetOrder(string cartId);
 
     }
 }
