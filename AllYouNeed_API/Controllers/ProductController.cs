@@ -1,4 +1,5 @@
-﻿using AllYouNeed_Models.Models;
+﻿using AllYouNeed_Models.DTOS.Requests;
+using AllYouNeed_Models.Models;
 using AllYouNeed_Services.Implementation;
 using AllYouNeed_Services.Interface;
 using Microsoft.AspNetCore.Authorization;
@@ -8,7 +9,7 @@ using System.Data;
 
 namespace AllYouNeed_API.Controllers
 {
-    [Authorize]
+   // [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class ProductController : ControllerBase
@@ -20,32 +21,31 @@ namespace AllYouNeed_API.Controllers
             _productService = productService;
         }
 
-        [HttpGet]
-        public async Task<List<Product>> GetBySearch(string keyword)
-        {
-            return await _productService.GetProductBySearch(keyword);
-        }
-        [HttpGet("{id}")]
-        public async Task<Product> GetById(string id)
-        {
-            return await _productService.GetProductById(id);
-        }
+        [HttpGet("search")]
+        public async Task<List<ProductRegistration>> GetBySearch(string keyword) 
+            => await _productService.GetProductBySearch(keyword);
 
-        [Authorize(Roles = "USER")]
-        [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Product product)
-        {
-            await _productService.RegisterProduct(product);
-            return CreatedAtAction(nameof(GetBySearch), new {id  = product.Id, product});
-        }
+        [HttpGet("get-by-id")]
+        public async Task<ProductRegistration> GetById(string id)
+            => await _productService.GetProductById(id);
+        
 
-        [HttpPut("{id}")]
-        public async Task Put(string id, [FromBody] Product product)
+        [HttpPost("register-product")]
+        public async Task<IActionResult> Post([FromBody] ProductRegistration product)
+            => Ok(await _productService.RegisterProduct(product));
+        
+
+        [HttpPut("update-product")]
+        public async Task Put(string id, [FromBody] ProductRegistration product)
             => await _productService.UpdateProductInfo(id, product);
 
-        // DELETE api/<ProductController>/5
-        [HttpDelete("{id}")]
+        [HttpDelete("delete")]
         public async Task Delete(string id)
-        => await _productService.DeleteProduct(id);
+            => await _productService.DeleteProduct(id);
+
+        [HttpPut("check-in-stock")]
+        public async Task<IActionResult> CheckStatus(string id)
+           => Ok(await _productService.CheckInStockStatus(id));
+        
     }
 }
