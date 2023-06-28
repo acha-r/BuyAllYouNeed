@@ -16,11 +16,7 @@ namespace AllYouNeed_Services.Implementation
             _database = mongoClient.GetDatabase(dbSetting.DatabaseName);
             _products = _database.GetCollection<Product>("Products");
         }
-        public async Task DeleteProduct(string id)
-            => await _products.DeleteOneAsync(x => x.Id.ToString() == id);
 
-        public async Task<Product> GetProductById(string id)
-           => await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync();
 
         public async Task<Product> RegisterProduct(Product product)
         {
@@ -41,7 +37,7 @@ namespace AllYouNeed_Services.Implementation
             return searchResults;
         }
 
-        public async Task UpdateInStockStatus(string id)
+        public async Task CheckInStockStatus(string id)
         {
             var product = await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
 
@@ -54,7 +50,12 @@ namespace AllYouNeed_Services.Implementation
         }
 
         public async Task UpdateProductInfo(string id, Product product)
-        => await _products.ReplaceOneAsync(x => x.Id.ToString() == id, product);
+                => await _products.ReplaceOneAsync(x => x.Id.ToString() == id, product);
 
+        public async Task DeleteProduct(string id)
+                => await _products.DeleteOneAsync(x => x.Id.ToString() == id);
+
+        public async Task<Product> GetProductById(string id)
+           => await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync();
     }
 }

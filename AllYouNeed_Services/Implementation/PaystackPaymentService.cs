@@ -30,10 +30,10 @@ namespace AllYouNeed_Services.Implementation
             _products = _database.GetCollection<Product>("Products");
         }
 
-        public async Task<TransactionInitializeResponse> InitializeTransaction(string productId, string buyerId, int numOfItems = 1)
+        public async Task<TransactionInitializeResponse> InitializeTransaction(string productId, string email, int numOfItems = 1)
         {
             var product = await _productService.GetProductById(productId) ?? throw new KeyNotFoundException("Product does not exist");
-            var merchant = await _merchantService.GetMerchant(buyerId);
+            var merchant = await _merchantService.GetMerchant(email);
             
             var request = new TransactionInitializeRequest()
             {
