@@ -30,25 +30,33 @@ namespace AllYouNeed_Services.Implementation
             _products = _database.GetCollection<Product>("Products");
         }
 
-        public async Task<TransactionInitializeResponse> InitializeTransaction(string productId, string email, int numOfItems = 1)
+        public async Task<TransactionInitializeResponse> InitializeTransaction(string cartId)
         {
-            var product = await _productService.GetProductById(productId) ?? throw new KeyNotFoundException("Product does not exist");
-            var merchant = await _merchantService.GetMerchant(email);
+            var cart = await _database.GetCollection<ShoppingCart>("Cart").Find(x => x.Id.ToString() == cartId).FirstOrDefaultAsync() ?? throw new Exception("Order not found");
+
             
             var request = new TransactionInitializeRequest()
             {
-                AmountInKobo = (int)(product.Price * numOfItems) * 100 ,
-                Email = merchant.Email,
+                AmountInKobo = (int)cart.TotalAmt * 100 ,
+                Email = cart.BuyerEmail,
                 Reference = GenerateRef().ToString(),
                 Currency = "NGN",
                 CallbackUrl = "https://localhost:7061/swagger/index.html"
             };
             
             TransactionInitializeResponse response = _paystackApi.Transactions.Initialize(request);
+
             if (response.Status)
             {
-                product.Quantity -= numOfItems;
-                //await _products.ReplaceOneAsync(productId., product);
+                
+                foreach (var item in cart.Products)
+                {
+                    var product = _products.Find(x => x.Id.ToString() == item.Key).FirstOrDefault();
+                    product.Quantity -= item.Value;
+                    var productQtyFilter = Builders<Product>.Filter.Eq("_id", product.Id);
+                    var updateQty = Builders<Product>.Update.Set("quantity", product.Quantity);
+                    await _productService.CheckInStockStatus(item.Key);
+                }
             }
             return response;
 
