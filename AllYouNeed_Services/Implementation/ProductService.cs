@@ -1,4 +1,5 @@
-﻿using AllYouNeed_Models.Interface;
+﻿using AllYouNeed_Models.DTOS.Requests;
+using AllYouNeed_Models.Interface;
 using AllYouNeed_Models.Models;
 using AllYouNeed_Services.Interface;
 using MongoDB.Bson;
@@ -18,13 +19,20 @@ namespace AllYouNeed_Services.Implementation
         }
 
 
-        public async Task<Product> RegisterProduct(Product product)
+        public async Task<ProductRegistration> RegisterProduct(ProductRegistration product)
         {
-            await _products.InsertOneAsync(product);
+            if (product.Price <= 0 || product.Quantity <= 0) throw new Exception("Value must be greater than zero");
+
+            await _products.InsertOneAsync(new Product
+            {
+                Name = product.Name,
+                Price = product.Price,
+                Quantity = product.Quantity
+            });
             return product;
         }
 
-        public async Task<List<Product>> GetProductBySearch(string keyword)
+        public async Task<List<ProductRegistration>> GetProductBySearch(string keyword)
         {
             var keys = Builders<Product>.IndexKeys.Text("name");
             var indexOptions = new CreateIndexOptions { DefaultLanguage = "english" };
@@ -32,12 +40,23 @@ namespace AllYouNeed_Services.Implementation
             _products.Indexes.CreateOne(model);
 
             var filter = Builders<Product>.Filter.Regex("name", new BsonRegularExpression($".*{keyword}.*", "i"));
-            var searchResults = await _products.Find(filter).ToListAsync();
+            var searchResult = await _products.Find(filter).ToListAsync();
 
-            return searchResults;
+            var product = new List<ProductRegistration>();
+
+            foreach (var item in searchResult)
+            {
+                product.Add(new ProductRegistration
+                {
+                    Name = item.Name,
+                    Price = item.Price,
+                    Quantity = item.Quantity
+                });
+            }
+            return product;
         }
 
-        public async Task CheckInStockStatus(string id)
+        public async Task<bool> CheckInStockStatus(string id)
         {
             var product = await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
 
@@ -45,17 +64,34 @@ namespace AllYouNeed_Services.Implementation
             {
                 product.InStock = false;
 
-                return;
+                return false;
             }
+            return true;
         }
 
-        public async Task UpdateProductInfo(string id, Product product)
-                => await _products.ReplaceOneAsync(x => x.Id.ToString() == id, product);
+        public async Task UpdateProductInfo(string id, ProductRegistration product)
+        {
+            var prod = await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
+            prod.Name = product.Name;
+            prod.Price = product.Price;
+            prod.Quantity = product.Quantity;
+
+            await _products.ReplaceOneAsync(x => x.Id.ToString() == id, prod);
+        }
 
         public async Task DeleteProduct(string id)
                 => await _products.DeleteOneAsync(x => x.Id.ToString() == id);
 
-        public async Task<Product> GetProductById(string id)
-           => await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync();
+        public async Task<ProductRegistration> GetProductById(string id)
+        {
+            var prod = await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
+
+            return new ProductRegistration
+            {
+                Name = prod.Name,
+                Price = prod.Price,
+                Quantity = prod.Quantity
+            };
+        }
     }
 }

@@ -1,4 +1,5 @@
-﻿using AllYouNeed_Models.Models;
+﻿using AllYouNeed_Models.DTOS.Requests;
+using AllYouNeed_Models.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,11 +10,11 @@ namespace AllYouNeed_Services.Interface
 {
     public interface IProductService
     {
-        Task<Product> GetProductById(string id);
-        Task<List<Product>> GetProductBySearch(string text); //text search and pagination
-        Task<Product> RegisterProduct(Product product);
-        Task UpdateProductInfo(string id, Product merchant);
-        Task CheckInStockStatus(string id);
+        Task<ProductRegistration> GetProductById(string id);
+        Task<List<ProductRegistration>> GetProductBySearch(string keyword); //text search and pagination
+        Task<ProductRegistration> RegisterProduct(ProductRegistration product);
+        Task UpdateProductInfo(string id, ProductRegistration product);
+        Task<bool> CheckInStockStatus(string id);
         Task DeleteProduct(string id);
     }
 }

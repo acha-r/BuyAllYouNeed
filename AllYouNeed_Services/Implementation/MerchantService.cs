@@ -24,6 +24,8 @@ namespace AllYouNeed_Services.Implementation
         {
             ApplicationUser user = await _userManager.FindByEmailAsync(email) ?? throw new KeyNotFoundException("User does not exist");
 
+            if (request.Balance < 1000) throw new Exception("Amount cannot be less than NGN 1000");
+
             await _merchants.InsertOneAsync(new Merchant
             {
                 FullName = user.FullName,
@@ -54,7 +56,7 @@ namespace AllYouNeed_Services.Implementation
         {
             try
             {
-                if (request.Balance <= 1000)
+                if (request.Balance < 1000)
                     return "Amount cannot be less than NGN 1000";
 
                 var merchantFilter = Builders<Merchant>.Filter.Eq("email", email);

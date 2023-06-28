@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.ComponentModel.DataAnnotations;
 
 namespace AllYouNeed_Models.Models
 {
@@ -24,7 +25,8 @@ namespace AllYouNeed_Models.Models
         public long Quantity { get; set; }
 
         [BsonElement("in_stock")]
-        public bool InStock { get; set; }
+        public bool InStock { get; set; } = true;
 
     }
+
 }
