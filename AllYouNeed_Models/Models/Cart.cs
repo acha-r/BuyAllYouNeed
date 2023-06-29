@@ -12,17 +12,20 @@ namespace AllYouNeed_Models.Models
 {
     
     [CollectionName("Cart")]
-    public class ShoppingCart
+    public class Cart
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
         public ObjectId Id { get; set; }
 
         [BsonElement("products")]
-        public Dictionary<string, int>? Products { get; set; } = new Dictionary<string, int>();
+        public Dictionary<string, int> Products { get; set; } = new Dictionary<string, int>();
 
         [BsonElement("email")]
         [EmailAddress]
         public string Shopper { get; set; } = string.Empty;
+
+        [BsonElement("sub_total")]
+        public decimal SubTotal { get; set; }
     }
 }

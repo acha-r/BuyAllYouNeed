@@ -89,7 +89,7 @@ namespace AllYouNeed_Services.Implementation
         public async Task<ProductRegistration> GetProductById(string id)
         {
             var prod = await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
-            if (!prod.InStock) throw new Exception("Out of stock");
+            if (!prod.InStock) throw new Exception($"{prod.Name} is out of stock");
 
             return new ProductRegistration
             {

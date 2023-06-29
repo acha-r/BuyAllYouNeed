@@ -17,23 +17,23 @@ namespace AllYouNeed_API.Controllers
             _cartServices = cartServices;
         }
 
-        [HttpPost("make-an-order")]
-        public async Task<IActionResult> MakeOrder(string email, [FromBody] CartDTO cart)
-            => Ok(await _cartServices.MakeAnOrder(email, cart));
+        [HttpPost("add-to-cart")]
+        public async Task<IActionResult> AddToCart([FromBody] CartDTO cart)
+            => Ok(await _cartServices.CreateCart(cart));
         
 
-        [HttpGet("get-by-id")]
-        public async Task<IActionResult> GetById(string cartId)
-            => Ok(await _cartServices.GetOrder(cartId));
+        [HttpGet("get-cart-summary")]
+        public async Task<IActionResult> GetById()
+            => Ok(await _cartServices.GetCartSummary());
 
 
-        [HttpPut("update-order")]
-        public async Task<IActionResult> Put(string id, [FromBody] CartDTO request)
-            => Ok(await _cartServices.UpdateOrder(id, request));
+        [HttpPut("remove-from-cart")]
+        public async Task<IActionResult> Put(string cartId, [FromBody] CartDTO request)
+            => Ok(await _cartServices.RemoveFromCart(cartId, request));
 
-        [HttpDelete("delete")]
+        [HttpDelete("delete-cart")]
         public async Task Delete(string id)
-            => await _cartServices.DeleteOrder(id);
+            => await _cartServices.DeleteCart(id);
 
         
     }

@@ -20,7 +20,7 @@ namespace AllYouNeed_API.Controllers
         [HttpPost]
         public async Task<IActionResult> InitializePayement(string cartId)
         {
-            var response = await _paymentService.InitializeTransaction(cartId);
+            var response = await _paymentService.PayViaPaystack(cartId);
             
             return Ok(response.Data.AuthorizationUrl);
         }
@@ -28,7 +28,7 @@ namespace AllYouNeed_API.Controllers
         [HttpGet]
         public async Task<IActionResult> Verfiy(string reference, string cartId)
         {
-            return Ok(await _paymentService.Verfiy(reference, cartId));
+            return Ok(await _paymentService.VerfiyPaystackPayment(reference, cartId));
         }
     }
 

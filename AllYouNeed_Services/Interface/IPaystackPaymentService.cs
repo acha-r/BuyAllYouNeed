@@ -9,7 +9,7 @@ namespace AllYouNeed_Services.Interface
 {
     public interface IPaystackPaymentService
     {
-        Task<TransactionVerifyResponse> Verfiy(string reference, string cartId);
-        Task<TransactionInitializeResponse> InitializeTransaction(string cartId);
+        Task<TransactionVerifyResponse> VerfiyPaystackPayment(string reference, string cartId);
+        Task<TransactionInitializeResponse> PayViaPaystack(string cartId);
     }
 }

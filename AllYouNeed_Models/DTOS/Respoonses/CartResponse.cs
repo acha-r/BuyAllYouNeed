@@ -2,8 +2,9 @@
 {
     public class CartResponse
     {
-        public Dictionary<string, int>? Products { get; set; } = new Dictionary<string, int>();
+        public ICollection<string> Products { get; set; } = new List<string>();
         public decimal? Total { get; set; }
+        public string Shopper { get; set; }
         public string Response { get; set; } = string.Empty;
     }
 }

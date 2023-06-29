@@ -97,7 +97,7 @@ namespace AllYouNeed_API
             builder.Services.AddScoped<IMerchantServices, MerchantService>();
             builder.Services.AddScoped<IProductService, ProductService>();
             builder.Services.AddScoped<ICartServices, CartServices>();
-            builder.Services.AddTransient<IPaystackPaymentService, PaystackPaymentService>();
+            builder.Services.AddTransient<IPaystackPaymentService, PaymentService>();
 
 
             builder.Services.AddControllers();
