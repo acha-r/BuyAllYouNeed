@@ -14,7 +14,7 @@ namespace AllYouNeed_Services.Interface
         Task<List<ProductRegistration>> GetProductBySearch(string keyword); //text search and pagination
         Task<ProductRegistration> RegisterProduct(ProductRegistration product);
         Task UpdateProductInfo(string id, ProductRegistration product);
-        Task<bool> CheckInStockStatus(string id);
+        Task<bool> UpdateInStockStatus(string id);
         Task DeleteProduct(string id);
     }
 }

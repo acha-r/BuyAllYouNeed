@@ -42,6 +42,9 @@ namespace AllYouNeed_Services.Implementation
             var filter = Builders<Product>.Filter.Regex("name", new BsonRegularExpression($".*{keyword}.*", "i"));
             var searchResult = await _products.Find(filter).ToListAsync();
 
+            searchResult.RemoveAll(x => x.InStock == false);
+            
+
             var product = new List<ProductRegistration>();
 
             foreach (var item in searchResult)
@@ -56,11 +59,11 @@ namespace AllYouNeed_Services.Implementation
             return product;
         }
 
-        public async Task<bool> CheckInStockStatus(string id)
+        public async Task<bool> UpdateInStockStatus(string id)
         {
             var product = await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
 
-            if (product.Quantity == 0)
+            if (product.Quantity <= 0)
             {
                 product.InStock = false;
 
@@ -75,6 +78,7 @@ namespace AllYouNeed_Services.Implementation
             prod.Name = product.Name;
             prod.Price = product.Price;
             prod.Quantity = product.Quantity;
+            prod.InStock = await UpdateInStockStatus(id);
 
             await _products.ReplaceOneAsync(x => x.Id.ToString() == id, prod);
         }
@@ -85,6 +89,7 @@ namespace AllYouNeed_Services.Implementation
         public async Task<ProductRegistration> GetProductById(string id)
         {
             var prod = await _products.Find(x => x.Id.ToString() == id).FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
+            if (!prod.InStock) throw new Exception("Out of stock");
 
             return new ProductRegistration
             {

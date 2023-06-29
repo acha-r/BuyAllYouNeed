@@ -45,7 +45,7 @@ namespace AllYouNeed_API.Controllers
 
         [HttpPut("check-in-stock")]
         public async Task<IActionResult> CheckStatus(string id)
-           => Ok(await _productService.CheckInStockStatus(id));
+           => Ok(await _productService.UpdateInStockStatus(id));
         
     }
 }
