@@ -10,6 +10,7 @@ using System.Threading.Tasks;
 
 namespace AllYouNeed_Models.Models
 {
+    
     [CollectionName("Cart")]
     public class ShoppingCart
     {
@@ -18,19 +19,10 @@ namespace AllYouNeed_Models.Models
         public ObjectId Id { get; set; }
 
         [BsonElement("products")]
-        public Dictionary<string, int>? Products { get; set; }
-
-        [BsonElement("total_amt")]
-        public decimal TotalAmt { get; set; }
+        public Dictionary<string, int>? Products { get; set; } = new Dictionary<string, int>();
 
         [BsonElement("email")]
         [EmailAddress]
-        public string BuyerEmail { get; set; } = string.Empty;
-
-        [BsonElement("deliver_address")]
-        public string DeliveryAddress { get; set; } = string.Empty;
-
-        [BsonElement("has_paid")]
-        public bool HasPaid { get; set; } = false;
+        public string Shopper { get; set; } = string.Empty;
     }
 }

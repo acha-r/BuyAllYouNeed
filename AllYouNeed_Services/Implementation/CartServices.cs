@@ -3,12 +3,9 @@ using AllYouNeed_Models.DTOS.Respoonses;
 using AllYouNeed_Models.Interface;
 using AllYouNeed_Models.Models;
 using AllYouNeed_Services.Interface;
+using Microsoft.AspNetCore.Http;
 using MongoDB.Driver;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Security.Claims;
 
 namespace AllYouNeed_Services.Implementation
 {
@@ -16,90 +13,83 @@ namespace AllYouNeed_Services.Implementation
     {
         private readonly IMongoCollection<ShoppingCart> _cart;
         private IMongoDatabase _database;
-        //private readonly IProductService _productService;
+        private readonly IProductService _productService;
+        private readonly IHttpContextAccessor _httpContext;
 
 
-        public CartServices(IAllYouNeedRepo dbSetting, IMongoClient mongoClient)
+        public CartServices(IHttpContextAccessor httpContext, IAllYouNeedRepo dbSetting, IMongoClient mongoClient, IProductService productService)
         {
             _database = mongoClient.GetDatabase(dbSetting.DatabaseName);
             _cart = _database.GetCollection<ShoppingCart>("Cart");
+            _productService = productService;
+            _httpContext = httpContext;
         }
 
-        public async Task<CartResponse> MakeAnOrder(string email, CartDTO cart)
+        public async Task<string> AddToCart(CartDTO cart)
         {
-            var customer = await _database.GetCollection<Merchant>("Merchants").Find(x => x.Email == email).FirstOrDefaultAsync() ?? throw new Exception("User not found");
-            decimal totalAmt = 0;
+            var user = _httpContext.HttpContext.User.FindFirstValue(ClaimTypes.Name);
 
+            if (cart.Products is null) throw new Exception("No item added");
+
+            ShoppingCart cartt = new();
+
+            foreach (var item in cart.Products)
+            {
+                var product = await _productService.GetProductById(item.Key);
+                if (item.Value <= 1) throw new Exception("Please pick at least one item");
+                if (item.Value > product.Quantity) throw new Exception($"Only {product.Quantity} {product.Name} available");
+
+                cartt.Products.Add($"{product.Name} ({item.Key})", item.Value);
+            }
+
+            cartt.Shopper = user;
+
+            await _cart.InsertOneAsync(cartt);
+
+            return "Added to cart";
+        }
+
+        public async Task<CartResponse> GetCartSummary()
+        {
+            var user = _httpContext.HttpContext.User.FindFirstValue(ClaimTypes.Name);
+
+            //log in to confirm if this works
+            if (user == null) throw new Exception("Please log in to see summary");
+
+            var cart = await _cart.Find(x => x.Shopper == user).FirstOrDefaultAsync() ?? throw new Exception("No cart found");
             CartResponse response = new();
 
             foreach (var item in cart.Products)
             {
-                var product = await _database.GetCollection<Product>("Products").Find(x => x.Id.ToString() == item.Key).FirstOrDefaultAsync() ?? throw new Exception("Product not found");
-                if (!product.InStock) throw new Exception($"{product.Name} is out of stock");
-                if (item.Value <= 1) throw new Exception("Please pick at least one item");
-                totalAmt += (product.Price * item.Value);
-
-                response.Products.Add(($"{product.Name} ({product.Id})"), item.Value);
+                response.Products.Append(($"{item.Key}\t\t+ {item.Value}"));
             }
-
-            await _cart.InsertOneAsync(new ShoppingCart
-            {
-                Products = cart.Products,
-                BuyerEmail = email,
-                DeliveryAddress = cart.DeliveryAddress,
-                TotalAmt = totalAmt
-            });
-
-            response.Total = totalAmt;
-            response.Response = "Proceed to make payment";
-
             return response;
         }
-
-        public async Task<CartResponse> UpdateOrder(string cartId, CartDTO cartUpdate)
+ 
+        public async Task<string> RemoveFromCart(string cartId, CartDTO cartUpdate)
         {
-            decimal totalAmt = 0;
-
-            var cart = await _cart.Find(x => x.Id.ToString() == cartId).FirstOrDefaultAsync() ?? throw new Exception("Order not found");
-            if (cart.HasPaid)
-                throw new Exception("Cannot update paid order");
+            var cart = await _cart.Find(x => x.Id.ToString() == cartId).FirstOrDefaultAsync() ?? throw new Exception("No cart found");
 
             foreach (var item in cartUpdate.Products)
             {
-                var product = await _database.GetCollection<Product>("Products").Find(x => x.Id.ToString() == item.Key).FirstOrDefaultAsync() ?? throw new Exception("Product not found");
-                if (!product.InStock) throw new Exception($"{product.Name} is out of stock");
-                if (item.Value <= 1) throw new Exception("Please pick at least one item");
-                totalAmt += (product.Price * item.Value);
-            }
+                var product = await _database.GetCollection<Product>("Products").Find(x => x.Id.ToString() == item.Key)
+                    .FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
 
-            cart.DeliveryAddress = cartUpdate.DeliveryAddress;
-            cart.Products = cartUpdate.Products;
-            cart.TotalAmt = totalAmt;
+                if (!cart.Products.ContainsKey(item.Key)) throw new KeyNotFoundException($"{product.Name} ({item.Key}): " +
+                    $"You do not have this item in your cart");
+
+                if (item.Value! >= 1) throw new Exception("Invalid number");
+
+                cart.Products.Remove($"{product.Name} ({item.Key})");
+            }
 
             await _cart.ReplaceOneAsync(x => x.Id.ToString() == cartId, cart);
 
-            return new CartResponse
-            {
-                Products = cart.Products,
-                Total = cart.TotalAmt,
-                Response = "Updated. Proceed to make payment"
-            };
+            return "Cart updated";
         }
 
-
-        public async Task DeleteOrder(string cartId) 
+        public async Task DeleteCart(string cartId)
             => await _cart.DeleteOneAsync(cartId);
-        public async Task<CartResponse> GetOrder(string cartId)
-        {
-            var cart = await _cart.Find(x => x.Id.ToString() == cartId).FirstOrDefaultAsync();
 
-            return new CartResponse
-            {
-                Products = cart.Products,
-                Total = cart.TotalAmt,
-                Response = $"Order completed: {cart.HasPaid}"
-            };
-        }
     }
-
 }

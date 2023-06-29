@@ -12,8 +12,7 @@ namespace AllYouNeed_Models.DTOS.Requests
         [Required]
         public Dictionary<string, int>? Products { get; set; } = new Dictionary<string, int>();
 
-        [Required]
-        public string DeliveryAddress { get; set; } = string.Empty;
+        
     }
 
     
