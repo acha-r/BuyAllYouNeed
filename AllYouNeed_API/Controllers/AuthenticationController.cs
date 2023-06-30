@@ -14,6 +14,11 @@ namespace AllYouNeed_API.Controllers
         {
             _authService = authService;
         }
+        [HttpPut("add-user-to-role")]
+        public async Task<IActionResult> AddToRole(string userId, string roleName)
+        {
+            return Ok(await _authService.AddUserToRole(userId, roleName));
+        }
 
         [HttpPost]
         [Route("login")]

@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace AllYouNeed_API.Controllers
 {
+    [Authorize(Roles = "admin")]
     [Route("api/[controller]")]
     [ApiController]
     public class MerchantController : ControllerBase
@@ -23,7 +24,7 @@ namespace AllYouNeed_API.Controllers
             => await merchantServices.GetMerchants();
 
         [HttpGet("get-merchant")]
-        public async Task<ActionResult<Merchant>> Get(string email)
+        public async Task<ActionResult<Merchant>> GetByEmail(string email)
             => await merchantServices.GetMerchant(email);
 
         [HttpPost("register-merchant")]

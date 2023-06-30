@@ -14,5 +14,6 @@ namespace AllYouNeed_Services.Interface
         Task<RoleResponse> CreateRole(RoleRequest request);
         Task<LogInResponse> Login(LogInRequest request);
         Task<RegistrationResponse> Register(RegisterRequest request);
+        Task<RoleResponse> AddUserToRole(string userId, string roleName);
     }
 }

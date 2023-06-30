@@ -75,6 +75,7 @@ namespace AllYouNeed_Services.Implementation
             response.Shopper = cart.Shopper;
             response.Total = cart.SubTotal;
             response.Response = "You can add more items to cart OR proceed to checkout";
+
             return response;
         }
 
@@ -120,7 +121,7 @@ namespace AllYouNeed_Services.Implementation
 
             var product = await _database.GetCollection<Product>("Products").Find(x => x.Id.ToString() == productId)
                     .FirstOrDefaultAsync() ?? throw new KeyNotFoundException("Product does not exist");
-            if (num! >= 1) throw new Exception("Invalid number");
+            if (!( num >= 1)) throw new Exception("Invalid number");
             if (num > product.Quantity) throw new Exception($"Only {product.Quantity} {product.Name} in stock");
 
             value = (productId, num);
@@ -128,8 +129,7 @@ namespace AllYouNeed_Services.Implementation
             switch (addOrRemo)
             {
                 case "add":
-                    if (cart.Products.ContainsKey(productId)) throw new KeyNotFoundException($"{product.Name} ({productId}): " +
-                $"Item already in cart");
+                    if (cart.Products.ContainsKey(productId)) cart.Products[productId] = num;
                     break;
                 default:
                     if (!cart.Products.ContainsKey(productId)) throw new KeyNotFoundException($"{product.Name} ({productId}): " +

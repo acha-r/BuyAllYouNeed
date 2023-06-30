@@ -1,11 +1,13 @@
 ﻿using AllYouNeed_Models.DTOS.Requests;
 using AllYouNeed_Models.DTOS.Respoonses;
 using AllYouNeed_Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AllYouNeed_API.Controllers
 {
+    [Authorize]
     [Route("api/[controller]")]
     [ApiController]
     public class CartController : ControllerBase
@@ -17,14 +19,18 @@ namespace AllYouNeed_API.Controllers
             _cartServices = cartServices;
         }
 
-        [HttpPost("add-to-cart")]
-        public async Task<IActionResult> AddToCart([FromBody] CartDTO cart)
+        [HttpPost("create-cart")]
+        public async Task<IActionResult> CreateCart([FromBody] CartDTO cart)
             => Ok(await _cartServices.CreateCart(cart));
-        
+
+        [HttpPut("add-to-cart")]
+        public async Task<IActionResult> AddToCart(string cartId, [FromBody] CartDTO cart)
+           => Ok(await _cartServices.AddToCart(cartId, cart));
+
 
         [HttpGet("get-cart-summary")]
-        public async Task<IActionResult> GetById()
-            => Ok(await _cartServices.GetCartSummary());
+        public async Task<IActionResult> GetById(string cartId)
+            => Ok(await _cartServices.GetCartSummary(cartId));
 
 
         [HttpPut("remove-from-cart")]
