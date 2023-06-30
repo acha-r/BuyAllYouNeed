@@ -1,6 +1,7 @@
 ﻿using AllYouNeed_Models.DTOS.Requests;
 using AllYouNeed_Models.DTOS.Respoonses;
 using AllYouNeed_Services.Interface;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace AllYouNeed_API.Controllers
