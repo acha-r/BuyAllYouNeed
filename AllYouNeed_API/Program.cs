@@ -1,21 +1,16 @@
 
 using AllYouNeed_API.Extensions;
 using AllYouNeed_Models.Implementation;
-using AllYouNeed_Models.Interface;
 using AllYouNeed_Models.Models;
-using AllYouNeed_Services.Implementation;
-using AllYouNeed_Services.Interface;
 using AspNetCore.Identity.MongoDbCore.Extensions;
 using AspNetCore.Identity.MongoDbCore.Infrastructure;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Serializers;
-using MongoDB.Driver;
 using System.Text;
 
 namespace AllYouNeed_API
@@ -88,17 +83,7 @@ namespace AllYouNeed_API
             builder.Services.Configure<AllYouNeedRepo>(
                 builder.Configuration.GetSection(nameof(AllYouNeedRepo)));
 
-            builder.Services.AddSingleton<IAllYouNeedRepo>(x =>
-            x.GetRequiredService<IOptions<AllYouNeedRepo>>().Value);
-
-            builder.Services.AddSingleton<IMongoClient>(x =>
-            new MongoClient(builder.Configuration.GetValue<string>("AllYouNeedRepo:ConnectionString")));
-
-            builder.Services.AddScoped<IAuthenticationService, AuthenticationService>();
-            builder.Services.AddScoped<IMerchantServices, MerchantService>();
-            builder.Services.AddScoped<IProductService, ProductService>();
-            builder.Services.AddScoped<ICartServices, CartServices>();
-            builder.Services.AddTransient<IPaystackPaymentService, PaymentService>();
+            builder.Services.RegisterServices(builder.Configuration);
 
 
             builder.Services.AddControllers();
@@ -145,6 +130,7 @@ namespace AllYouNeed_API
                 app.UseSwaggerUI();
             }
 
+            app.ConfigureException(builder.Environment);
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseForwardedHeaders(new ForwardedHeadersOptions
