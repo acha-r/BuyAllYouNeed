@@ -10,6 +10,7 @@ namespace AllYouNeed_Services.Interface
 {
     public interface IProductService
     {
+        Task PreSeedProducts();
         Task<ProductRegistration> GetProductById(string id);
         Task<List<ProductRegistration>> GetProductBySearch(string keyword); //text search and pagination
         Task<ProductRegistration> RegisterProduct(ProductRegistration product);

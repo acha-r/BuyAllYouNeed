@@ -20,6 +20,13 @@ namespace AllYouNeed_API.Controllers
             _productService = productService;
         }
 
+
+        [HttpPost("pre-seed")]
+        public async Task PreSeed()
+        {
+            await _productService.PreSeedProducts();
+        }
+
         [AllowAnonymous]
         [HttpGet("search")]
         public async Task<List<ProductRegistration>> GetBySearch(string keyword) 

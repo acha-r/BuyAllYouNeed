@@ -98,5 +98,37 @@ namespace AllYouNeed_Services.Implementation
                 Quantity = prod.Quantity
             };
         }
+
+        public async Task PreSeedProducts()
+        {
+            var data = new List<Product>
+            {
+                new Product
+                {
+                    Name = "Carton",
+                    Price = 500,
+                    Quantity = 200
+                },
+                new Product
+                {
+                    Name = "Cellotape",
+                    Price = 250,
+                    Quantity = 90
+                },
+                new Product
+                {
+                    Name = "Balloon",
+                    Price = 50,
+                    Quantity = 230
+                },
+                new Product
+                {
+                    Name = "Life",
+                    Price = 220000,
+                    Quantity = 5
+                }
+            };
+            await _products.InsertManyAsync(data);
+        }
     }
 }
