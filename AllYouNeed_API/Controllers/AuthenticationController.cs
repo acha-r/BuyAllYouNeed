@@ -3,6 +3,8 @@ using AllYouNeed_Models.DTOS.Respoonses;
 using AllYouNeed_Services.Interface;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Swashbuckle.AspNetCore.Annotations;
+//using Swashbuckle.Swagger.Annotations;
 
 namespace AllYouNeed_API.Controllers
 {
@@ -23,6 +25,11 @@ namespace AllYouNeed_API.Controllers
 
         [HttpPost]
         [Route("login")]
+        [SwaggerOperation(Summary = "logs in user")]
+        [SwaggerResponse(StatusCodes.Status200OK, Description = "Login successful", Type = typeof(LogInResponse))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Description = "Invalid log in details", Type = typeof(LogInResponse))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Description = "Failed to create user", Type = typeof(ErrorResponse))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, Description = "It's not you, it's us", Type = typeof(ErrorResponse))]
         public async Task<IActionResult> Login([FromBody] LogInRequest request)
         {
             try
@@ -42,6 +49,12 @@ namespace AllYouNeed_API.Controllers
 
         [HttpPost]
         [Route("register")]
+        [SwaggerOperation(Summary = "Creates user")]
+        [SwaggerResponse(StatusCodes.Status200OK, Description = "UserId of created user", Type = typeof(RegistrationResponse))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Description = "User with provided email already exists", Type = typeof(RegistrationResponse))]
+        [SwaggerResponse(StatusCodes.Status400BadRequest, Description = "Failed to create user", Type = typeof(ErrorResponse))]
+        [SwaggerResponse(StatusCodes.Status500InternalServerError, Description = "It's not you, it's us", Type = typeof(ErrorResponse))]
+
         public async Task<IActionResult> Register([FromBody] RegisterRequest request)
         {
             try

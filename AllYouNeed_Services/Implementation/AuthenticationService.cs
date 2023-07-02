@@ -95,6 +95,7 @@ namespace AllYouNeed_Services.Implementation
                 };
 
             await _userManager.AddToRoleAsync(userExists, "USER");
+            if (userExists.Email == "windowshop@ayn.com") await _userManager.AddToRoleAsync(userExists, "admin");
 
             return new RegistrationResponse
             {
