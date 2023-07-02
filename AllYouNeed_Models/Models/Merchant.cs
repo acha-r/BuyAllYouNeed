@@ -11,12 +11,6 @@ namespace AllYouNeed_Models.Models
         [BsonRepresentation(BsonType.ObjectId)] //converts Mongo datatype to a .net datatype
         public ObjectId Id { get; set; }
 
- /*       [BsonElement("first_name")]
-        public string FirstName { get; set; } = string.Empty;
-
-        [BsonElement("last_name")]
-        public string LastName { get; set; } = string.Empty;*/
-
         [BsonElement("email")]
         [EmailAddress]
         public string Email { get; set; } = string.Empty;
